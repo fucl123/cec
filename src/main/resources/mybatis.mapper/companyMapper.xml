@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.supply.mapper.CompanyMapper" >
+  <resultMap id="BaseResultMap" type="com.supply.domain.Company" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="usc_code" property="uscCode" jdbcType="VARCHAR" />
+    <result column="org_code" property="orgCode" jdbcType="VARCHAR" />
+    <result column="company_name" property="companyName" jdbcType="VARCHAR" />
+    <result column="company_code" property="companyCode" jdbcType="VARCHAR" />
+    <result column="legal_code" property="legalCode" jdbcType="VARCHAR" />
+    <result column="contact_tel" property="contactTel" jdbcType="VARCHAR" />
+    <result column="password" property="password" jdbcType="VARCHAR" />
+    <result column="mq_username" property="mqUsername" jdbcType="VARCHAR" />
+    <result column="mq_password" property="mqPassword" jdbcType="VARCHAR" />
+    <result column="mq_send_queue" property="mqSendQueue" jdbcType="VARCHAR" />
+    <result column="mq_return_queue" property="mqReturnQueue" jdbcType="VARCHAR" />
+    <result column="mq_address" property="mqAddress" jdbcType="VARCHAR" />
+    <result column="mq_virtual_host" property="mqVirtualHost" jdbcType="VARCHAR" />
+    <result column="private_key" property="privateKey" jdbcType="VARCHAR" />
+    <result column="public_key" property="publicKey" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="CHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, usc_code, org_code, company_name,company_code, legal_code, contact_tel, password, mq_username,
+    mq_password, mq_send_queue, mq_return_queue, mq_address,mq_virtual_host,private_key,public_key, type, create_time,
+    update_time
+  </sql>
+
+  <select id="list" resultMap="BaseResultMap">
+   SELECT <include refid="Base_Column_List"></include> from tb_company
+<where>
+  <if test="searchDto.uscCode !='' and searchDto.uscCode !=null">
+    and usc_code=#{searchDto.uscCode}
+  </if>
+  <if test="searchDto.companyName !='' and searchDto.companyName !=null">
+    and company_name=#{searchDto.companyName}
+  </if>
+  <if test="searchDto.gtAddDate !=null">
+    and update_time &gt; #{searchDto.gtAddDate}
+  </if>
+  <if test="searchDto.ltAddDate !=null">
+    and update_time &gt; #{searchDto.ltAddDate}
+  </if>
+</where>
+  </select>
+
+</mapper>

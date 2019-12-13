@@ -73,7 +73,10 @@ public class RabbitMqConfig
 		SimpleMessageListenerContainer simpleMessageListenerContainer =
 				new SimpleMessageListenerContainer(connectionFactory());
 
-		simpleMessageListenerContainer.setQueues(new Queue(receiveQueue));
+		//simpleMessageListenerContainer.setQueues(new Queue(receiveQueue));
+//		simpleMessageListenerContainer.setQueues(new Queue("44269619NY"));
+//		simpleMessageListenerContainer.setQueues(new Queue("55369628NY"));
+//		simpleMessageListenerContainer.setQueues(new Queue("33169609NY"));
 		simpleMessageListenerContainer.setExposeListenerChannel(true);
 		simpleMessageListenerContainer.setMaxConcurrentConsumers(1);
         simpleMessageListenerContainer.setPrefetchCount(1);

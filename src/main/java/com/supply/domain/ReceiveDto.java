@@ -16,5 +16,7 @@ public class ReceiveDto {
 
     private String status;
 
+    private String msgType;
+
     private String data;
 }

@@ -76,6 +76,73 @@ public class MqReceiver implements MessageListener {
         String data=null;
         String status = "0000";
         String body = new String(message.getBody());
+
+
+        LOGGER.info(body);
+        ReceiveDto receiveDto=null;
+        String sendCompanyCode = null;
+        String xmlId=null;
+        try {
+            receiveDto = JSONObject.parseObject(body, ReceiveDto.class);
+            sendCompanyCode=receiveDto.getCompanyCode();
+            xmlId=receiveDto.getXmlId();
+            xml = receiveDto.getData();
+            //xml = RSAUtil.decrypt(receiveDto.getData(), RSAUtil.getPrivateKey(privateKey));
+            //如果没有取到锁，线程等待100毫秒
+            while (!rateLimiter.tryAcquire()) {
+                LOGGER.info("rate limiter qps={}!", qps);
+                Thread.sleep(100);
+            }
+            // 企业备案编码相同的处理，不相同的不处理
+            if (true) {
+                if (xml.startsWith("\"")) {
+                    xml = xml.trim();
+                    xml = xml.substring(1, xml.length() - 1);
+                }
+                String signXml = HEAD + customSign.doSign(xml);
+                data = signXml;
+                //data= RSAUtil.encrypt(signXml, RSAUtil.getPublicKey(publicKey));
+                LOGGER.info("xml:{}", signXml);
+            } else {
+                LOGGER.info("sign xml copCode{}, customs code{} is not the same!",receiveDto.getCompanyCode(), companyCode);
+            }
+
+        }
+        catch (Exception e) {
+            try {
+                data = "加签失败";
+                //data= RSAUtil.encrypt("加签失败", RSAUtil.getPublicKey(publicKey));
+            } catch (Exception e1) {
+                LOGGER.error("sign fail, original xml：{}，exception message：{}", xml, e);
+            }
+            status="1111";
+            LOGGER.error("sign fail, original xml：{}，exception message：{}", xml, e);
+        }
+        JSONObject result=new JSONObject();
+        result.put("companyCode",sendCompanyCode);
+        result.put("status",status);
+        result.put("xmlId",xmlId);
+        result.put("msgType",receiveDto.getMsgType());
+        result.put("data",data);
+        rabbitTemplate.convertAndSend(sendCompanyCode+"_HZ", result.toJSONString());
+    }
+
+    /*@Override
+    public void onMessage(Message message) {
+        String xml = "";
+        String data=null;
+        String status = "0000";
+        String body = new String(message.getBody());
+
+        //String signXml = null;
+//        try {
+//            signXml = HEAD + customSign.doSign(body);
+//            LOGGER.info("xml:{}", signXml);
+//        } catch (ClientException e) {
+//            e.printStackTrace();
+//        }
+
+
         LOGGER.info(body);
         ReceiveDto receiveDto=null;
         String sendCompanyCode = null;
@@ -119,6 +186,6 @@ public class MqReceiver implements MessageListener {
         result.put("xmlId",xmlId);
         result.put("data",data);
         rabbitTemplate.convertAndSend(sendQueue, result.toJSONString());
-    }
+    }*/
 
 }

@@ -15,6 +15,7 @@ class CecApplicationTests {
 	@Test
 	void contextLoads() {
 
+
 		rabbitTemplate.convertAndSend("3702100002", "123");
 	}
 
